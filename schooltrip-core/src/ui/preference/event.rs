@@ -30,7 +30,7 @@ fn open_preference(
     mut ui_state: ResMut<UiState>,
     mut state: ResMut<State>,
     font_resource: Res<FontResource>,
-    asset_server: Res<AssetServer>,
+    texture_resource: Res<TextureResource>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     for _ in event_reader.iter(&event) {
@@ -53,14 +53,14 @@ fn open_preference(
                 parent
                     .spawn(ButtonComponents {
                         style: Style {
-                            size: Size::new(Val::Px(256.0), Val::Px(256.0)),
+                            size: Size::new(Val::Px(96.0), Val::Px(96.0)),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
                             ..Default::default()
                         },
                         material: materials.add(ColorMaterial {
                             color: Color::BLACK,
-                            texture: Some(asset_server.load("ui/inventory/slot/texture.png")),
+                            texture: texture_resource.get(SLOT_TEXTURE).map(Clone::clone),
                         }),
                         ..Default::default()
                     })
@@ -70,7 +70,7 @@ fn open_preference(
                                 value: "Preference".to_owned(),
                                 font: font_resource.get(FontKind::FiraCode).unwrap(),
                                 style: TextStyle {
-                                    font_size: 40.0,
+                                    font_size: 16.0,
                                     color: Color::BLACK,
                                     ..Default::default()
                                 },

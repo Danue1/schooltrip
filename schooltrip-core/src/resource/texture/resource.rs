@@ -9,33 +9,33 @@ impl Plugin for TextureResourcePlugin {
     }
 }
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub(crate) struct TextureResource {
-    textures: HashMap<TextureId, Handle<Texture>>,
+    textures: HashMap<String, Handle<Texture>>,
 }
 
 impl TextureResource {
-    pub(crate) fn get(&self, id: &TextureId) -> Option<&Handle<Texture>> {
+    pub(crate) fn get(&self, id: &str) -> Option<&Handle<Texture>> {
         self.textures.get(id)
     }
 
-    fn insert<Id: Into<TextureId>>(&mut self, id: Id, texture: Handle<Texture>) {
-        self.textures.insert(id.into(), texture);
+    fn insert(&mut self, id: &str, texture: Handle<Texture>) {
+        self.textures.insert(id.to_owned(), texture);
     }
 }
 
-fn startup(mut resource: ResMut<TextureResource>, asset_server: Res<AssetServer>) {
-    let mut next_id = {
-        let mut index = 0;
-        move || -> TextureId {
-            let id = index.into();
-            index += 1;
-            id
-        }
-    };
+pub(crate) const SLOT_TEXTURE: &'static str = "ui/inventory/slot/texture.png";
 
-    resource.insert(
-        next_id(),
-        asset_server.load("ui/inventory/slot/texture.png"),
-    );
+fn startup(mut resource: ResMut<TextureResource>, asset_server: Res<AssetServer>) {
+    macro_rules! load_texture {
+        ($($id:expr,)+) => {
+            $(
+                resource.insert($id, asset_server.load($id));
+            )+
+        };
+    }
+
+    load_texture![SLOT_TEXTURE,];
+
+    dbg!(resource);
 }
